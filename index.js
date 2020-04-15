@@ -24,6 +24,7 @@ function createStore(reducer) {
   // Dispatch is responsible for updating the state inside store.
   // The action argument is going to tell dispatch which specific event occured inside app.
   // Dispatch is called with an action
+  // Whenever dispatch is called, allReducers function is invoked and app function is then going to invoke reducers
   const dispatch = action => {
     state = reducer(state, action);
     listeners.forEach(listener => listener());
@@ -39,6 +40,7 @@ function createStore(reducer) {
 
 // App Code -- This is code that the user might write to decide how the state should change based off of the action
 // This todos function, is also a REDUCER function. It takes a state and an action, and reducing that to a brand new state
+// TODOS REDUCER
 function todos(state = [], action) {
   switch (action.type) {
     case 'ADD_TODO':
@@ -57,7 +59,28 @@ function todos(state = [], action) {
   }
 }
 
-const store = createStore(todos);
+// GOALS REDUCER
+function goals(state = [], action) {
+  switch (action.type) {
+    case 'ADD_GOAL':
+      return state.concat([action.goal]);
+    case 'REMOVE_GOAL':
+      return state.filter(goal => goal.id !== action.id);
+    default:
+      return state;
+  }
+}
+
+// Combine reducers to pass to createStore function below.
+// allreducers function invokes todos reducer and goals reducer, they return specific portions of state
+function allReducers(state = {}, action) {
+  return {
+    todos: todos(state.todos, action),
+    goals: goals(state.goals, action),
+  };
+}
+
+const store = createStore(allReducers);
 store.subscribe(() => {
   console.log('The new state is: ', store.getState());
 });
