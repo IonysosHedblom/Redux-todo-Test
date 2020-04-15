@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Todos and goals</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/redux/3.7.2/redux.min.js"></script>
   </head>
   <body>
     <div>
@@ -27,45 +28,6 @@
           Math.random().toString(36).substring(2) +
           new Date().getTime().toString(36)
         );
-      }
-      // Library Code, this code is closer to a library that you would download from NPM
-      function createStore(reducer) {
-        // The store should have four parts
-        // 1. The state
-        // 2. Get the state
-        // 3. Listen to changes on the state
-        // 4. Update the state
-
-        // The state (nr 1)
-        let state;
-        let listeners = [];
-
-        // Get the state (nr 2)
-        const getState = () => state;
-
-        // A way to listen to changes on the state (nr 3)
-        const subscribe = listener => {
-          listeners.push(listener);
-          return () => {
-            listeners = listeners.filter(l => l !== listener);
-          };
-        };
-
-        // Dispatch is responsible for updating the state inside store.
-        // The action argument is going to tell dispatch which specific event occured inside app.
-        // Dispatch is called with an action
-        // Whenever dispatch is called, allReducers function is invoked and app function is then going to invoke reducers
-        const dispatch = action => {
-          state = reducer(state, action);
-          listeners.forEach(listener => listener());
-        };
-
-        // Whenever createStore is invoked, return an object
-        return {
-          getState,
-          subscribe,
-          dispatch,
-        };
       }
 
       // App Code -- This is code that the user might write to decide how the state should change based off of the action
@@ -151,7 +113,7 @@
         };
       }
 
-      const store = createStore(allReducers);
+      const store = Redux.createStore(allReducers);
 
       store.subscribe(() => {
         const { goals, todos } = store.getState();
