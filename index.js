@@ -1,15 +1,5 @@
-// Pure function, based on the specific action that occurs return a new copy of the internal state.
-// Sets the default value of state to an empty array, otherwise state.concat wont work.
-// This todos function, is also a REDUCER function. It takes a state and an action, and reducing that to a brand new state
-function todos(state = [], action) {
-  if (action.type === 'ADD_TODO') {
-    return state.concat([action.todo]);
-  }
-  // If the action type is not ADD_TODO, just return the state
-  return state;
-}
-
-function createStore() {
+// Library Code, this code is closer to a library that you would download from NPM
+function createStore(reducer) {
   // The store should have four parts
   // 1. The state
   // 2. Get the state
@@ -31,9 +21,11 @@ function createStore() {
     };
   };
 
-  // Dispatch is responsible for updating the state inside store. The action argument is going to tell dispatch which specific event occured inside app.
+  // Dispatch is responsible for updating the state inside store.
+  // The action argument is going to tell dispatch which specific event occured inside app.
+  // Dispatch is called with an action
   const dispatch = action => {
-    state = todos(state, action);
+    state = reducer(state, action);
     listeners.forEach(listener => listener());
   };
 
@@ -45,9 +37,36 @@ function createStore() {
   };
 }
 
-const store = createStore();
+// App Code -- This is code that the user might write to decide how the state should change based off of the action
+// This todos function, is also a REDUCER function. It takes a state and an action, and reducing that to a brand new state
+function todos(state = [], action) {
+  switch (action.type) {
+    case 'ADD_TODO':
+      return state.concat([action.todo]);
+    case 'REMOVE_TODO':
+      return state.filter(todo => todo.id !== action.id);
+    case 'TOGGLE_TODO':
+      return state.map(todo =>
+        todo.id !== action.id
+          ? todo
+          : Object.assign({}, todo, { complete: !todo.complete })
+      );
+    // If the action type is not ADD_TODO, REMOVE_TODO or TOGGLE_TODO just return the state
+    default:
+      return state;
+  }
+}
 
-// Subscribe method
+const store = createStore(todos);
 store.subscribe(() => {
   console.log('The new state is: ', store.getState());
+});
+
+store.dispatch({
+  type: 'ADD_TODO',
+  todo: {
+    id: 0,
+    name: 'Learn  Redux',
+    complete: false,
+  },
 });
