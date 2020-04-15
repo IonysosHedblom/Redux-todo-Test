@@ -104,16 +104,14 @@
       }
 
       // Combine reducers to pass to createStore function below.
-      // allreducers function invokes todos reducer and goals reducer, they return specific portions of state
+      // Build in combineReducers function invokes todos reducer and goals reducer, they return specific portions of state
       // This is called a root REDUCER
-      function allReducers(state = {}, action) {
-        return {
-          todos: todos(state.todos, action),
-          goals: goals(state.goals, action),
-        };
-      }
-
-      const store = Redux.createStore(allReducers);
+      const store = Redux.createStore(
+        Redux.combineReducers({
+          todos,
+          goals,
+        })
+      );
 
       store.subscribe(() => {
         const { goals, todos } = store.getState();
